@@ -2,23 +2,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "vow",
+    name: "smart-dial",
     platforms: [
         .iOS(.v16)
     ],
     products: [
-        .library(name: "VowCore", targets: ["VowCore"]),
-        .library(name: "VowUI", targets: ["VowUI"])
+        .library(name: "DialCore", targets: ["DialCore"]),
+        .library(name: "DialUI", targets: ["DialUI"]),
     ],
     targets: [
         .target(
-            name: "VowCore",
-            path: "Sources/VowCore"
+            name: "DialCore",
+            path: "Sources/DialCore"
         ),
         .target(
-            name: "VowUI",
-            dependencies: ["VowCore"],
-            path: "Sources/VowUI"
+            name: "DialUI",
+            dependencies: ["DialCore"],
+            path: "Sources/DialUI"
         )
     ]
 )

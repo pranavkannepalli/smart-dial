@@ -33,7 +33,7 @@ create index if not exists places_place_type_idx
   on public.places(place_type);
 
 -- task_place_links
--- Join table linking a ChaosHQ/VowCore `tasks` row to one or more `places`.
+-- Join table linking a ChaosHQ `tasks` row to one or more `places`. (smart dial evidence sources)
 create table if not exists public.task_place_links (
   id uuid primary key default gen_random_uuid(),
 
