@@ -86,11 +86,27 @@ public struct PomodoroDialEngine: Codable, Equatable {
             let clampedSeconds = max(0, seconds)
             guard clampedSeconds > 0 else { return analytics }
 
-            state.remainingSeconds -= clampedSeconds
+            // Advance through as many segments as needed, carrying any leftover time
+            // into the next segment(s).
+            var remainingTime = clampedSeconds
+            while state.status == .running, remainingTime > 0 {
+                guard let _ = state.segment else { break }
 
-            // Handle overshoot by advancing multiple segments in one tick.
-            while state.status == .running, state.remainingSeconds <= 0 {
-                analytics.append(contentsOf: completeCurrentSegmentAndAdvance())
+                let segmentRemaining = state.remainingSeconds
+
+                // If we're already at/under the boundary, finish the current segment.
+                if segmentRemaining <= 0 {
+                    analytics.append(contentsOf: completeCurrentSegmentAndAdvance())
+                    continue
+                }
+
+                if remainingTime < segmentRemaining {
+                    state.remainingSeconds -= remainingTime
+                    remainingTime = 0
+                } else {
+                    remainingTime -= segmentRemaining
+                    analytics.append(contentsOf: completeCurrentSegmentAndAdvance())
+                }
             }
         }
 

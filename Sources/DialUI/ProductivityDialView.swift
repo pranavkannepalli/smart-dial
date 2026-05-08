@@ -68,10 +68,14 @@ public struct ProductivityDialView: View {
 
     private var dialForeground: some View {
         let progress = progress01
+        let glowOpacity = 0.15 + 0.45 * progress
+        let glowRadius = 10 + 28 * progress
+
         return Circle()
             .trim(from: 0, to: progress)
             .stroke(gradientColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
             .rotationEffect(.degrees(-90))
+            .shadow(color: ledColor.opacity(glowOpacity), radius: glowRadius)
             .animation(.easeOut(duration: 0.2), value: progress)
     }
 
@@ -92,8 +96,10 @@ public struct ProductivityDialView: View {
             switch engine.state.status {
             case .running:
                 _ = engine.handle(.pauseTapped)
+                triggerHaptic(style: .light)
             case .paused:
                 _ = engine.handle(.resumeTapped)
+                triggerHaptic(style: .light)
             default:
                 break
             }
@@ -126,6 +132,7 @@ public struct ProductivityDialView: View {
                 if engine.state.status == .idle {
                     let analytics = engine.handle(.spunToStart)
                     handleAnalytics(analytics)
+                    triggerHaptic(style: .medium)
                 } else if engine.state.status == .running || engine.state.status == .paused {
                     let analytics = engine.handle(.skipTapped)
                     handleAnalytics(analytics)
@@ -163,6 +170,24 @@ public struct ProductivityDialView: View {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    // LED-ish feedback (glow) synced to the active segment.
+    private var ledColor: Color {
+        switch engine.state.segment {
+        case .focus:
+            return .mint
+        case .rest:
+            return .cyan
+        case .none:
+            return .mint
+        }
+    }
+
+    private func triggerHaptic(style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        let generator = UIImpactFeedbackGenerator(style: style)
+        generator.prepare()
+        generator.impactOccurred()
     }
 
     // MARK: - Loop + analytics
