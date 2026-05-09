@@ -19,6 +19,11 @@ let package = Package(
             name: "DialUI",
             dependencies: ["DialCore"],
             path: "Sources/DialUI"
+        ),
+        .testTarget(
+            name: "DialCoreTests",
+            dependencies: ["DialCore"],
+            path: "Tests/DialCoreTests"
         )
     ]
 )
